@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSC Dual MCP Setup Guide — Windows</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fiord:#425A63;--storm:#6D7F86;
+  --cerulean:#00BDD3;--copper:#0096EF;
+  --bg:#F2F5F7;--surface:#FFFFFF;--surface2:#EEF2F4;
+  --border:#D8E2E6;--border-strong:#BDD0D7;
+  --green:#00A86B;--orange:#E07B20;--red:#D94444;--purple:#7C5CBF;
+  --text:#1a1f21;--muted:#425A63;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;}
+p{font-size:14px;color:var(--text);}
+strong{color:#1a1f21;font-weight:600;}
+a{color:var(--copper);text-decoration:none;}
+a:hover{text-decoration:underline;color:var(--cerulean);}
+ol,ul{padding-left:20px;}
+ol li,ul li{margin-bottom:8px;font-size:14px;color:var(--text);}
+ol li::marker{color:var(--copper);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;}
+
+.hero{background:linear-gradient(135deg,var(--fiord) 0%,#2d4a56 55%,#1e3a45 100%);padding:48px 40px 40px;position:relative;overflow:hidden;border-bottom:1px solid var(--border-strong);}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;width:360px;height:360px;background:radial-gradient(circle,rgba(0,189,211,.15) 0%,transparent 70%);pointer-events:none;}
+.hero-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--cerulean);background:rgba(0,189,211,.15);border:1px solid rgba(0,189,211,.35);padding:4px 12px;border-radius:20px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(24px,3.8vw,42px);font-weight:800;line-height:1.1;color:#fff;max-width:660px;margin-bottom:12px;}
+.hero h1 span{color:var(--cerulean);}
+.hero-sub{color:rgba(255,255,255,.65);max-width:560px;font-size:14px;font-weight:300;}
+.hero-pills{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+.hp{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;font-family:'JetBrains Mono',monospace;border:1px solid;}
+.hp.d{background:rgba(0,189,211,.12);border-color:rgba(0,189,211,.35);color:#7ee8f5;}
+.hp.m{background:rgba(0,150,239,.12);border-color:rgba(0,150,239,.35);color:#7dceff;}
+.hp .dot{width:6px;height:6px;border-radius:50%;}
+.hp.d .dot{background:var(--cerulean);}
+.hp.m .dot{background:var(--copper);}
+
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(66,90,99,.06);}
+.tab-bar-inner{max-width:960px;margin:0 auto;display:flex;padding:0 32px;}
+.tb{display:flex;align-items:center;gap:9px;padding:15px 22px;border:none;background:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--storm);border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;}
+.tb svg{width:15px;height:15px;flex-shrink:0;}
+.tb:hover{color:var(--fiord);background:var(--surface2);}
+.tb.ad{color:#007a8a;border-bottom-color:var(--cerulean);background:rgba(0,189,211,.04);}
+.tb.am{color:#004fa3;border-bottom-color:var(--copper);background:rgba(0,150,239,.04);}
+.tb.ab{color:#5b3fa6;border-bottom-color:var(--purple);background:rgba(124,92,191,.04);}
+.tb-bdg{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;transition:all .15s;}
+.tb:not(.ad):not(.am):not(.ab) .tb-bdg{background:var(--surface2);color:var(--storm);}
+.tb.ad .tb-bdg{background:rgba(0,189,211,.12);color:#007a8a;}
+.tb.am .tb-bdg{background:rgba(0,150,239,.12);color:#004fa3;}
+.tb.ab .tb-bdg{background:rgba(124,92,191,.12);color:#5b3fa6;}
+
+.wrap{max-width:960px;margin:0 auto;padding:32px 32px 80px;}
+.panel{display:none;}
+.panel.show{display:block;}
+
+.cfg-ban{background:#fff;border:1.5px solid rgba(0,150,239,.22);border-radius:14px;padding:24px 28px;margin-bottom:28px;box-shadow:0 1px 4px rgba(66,90,99,.06);}
+.cfg-ban h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#1a1f21;margin-bottom:5px;}
+.cfg-ban .csub{font-size:13.5px;color:var(--text);margin-bottom:14px;}
+.cfg-tags{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.ctg{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:3px 10px;border-radius:5px;font-weight:500;}
+.ctg.d{background:rgba(0,189,211,.1);color:#007a8a;border:1px solid rgba(0,189,211,.3);}
+.ctg.m{background:rgba(0,150,239,.1);color:#004fa3;border:1px solid rgba(0,150,239,.3);}
+.ctg .cd{width:5px;height:5px;border-radius:50%;}
+.ctg.d .cd{background:var(--cerulean);}
+.ctg.m .cd{background:var(--copper);}
+
+.section{margin-bottom:36px;}
+.shd{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+.sn{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;border-radius:8px;padding:5px 12px;white-space:nowrap;margin-top:4px;flex-shrink:0;}
+.sn.t{color:#007a8a;background:rgba(0,189,211,.09);border:1px solid rgba(0,189,211,.25);}
+.sn.b{color:#004fa3;background:rgba(0,150,239,.09);border:1px solid rgba(0,150,239,.25);}
+.sn.p{color:#5b3fa6;background:rgba(124,92,191,.09);border:1px solid rgba(124,92,191,.25);}
+.sn.e{color:#b83333;background:rgba(217,68,68,.08);border:1px solid rgba(217,68,68,.22);}
+.stitle{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:#1a1f21;line-height:1.2;}
+.ssub{font-size:13px;color:var(--muted);margin-top:4px;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:12px;box-shadow:0 1px 3px rgba(66,90,99,.05);}
+.ctitle{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#1a1f21;margin-bottom:12px;}
+
+.ac{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:5px 11px 5px 9px;border-radius:20px;margin-bottom:7px;border:1px solid;font-family:'DM Sans',sans-serif;}
+.ac svg{width:13px;height:13px;flex-shrink:0;}
+.ac.cmd{background:#161614;color:#7de8a8;border-color:#2e2e2a;}
+.ac.npad{background:rgba(0,150,239,.08);color:#003e85;border-color:rgba(0,150,239,.25);}
+.ac.expl{background:rgba(224,123,32,.07);color:#7a3f00;border-color:rgba(224,123,32,.25);}
+.ac.brws{background:rgba(124,92,191,.08);color:#3d1f85;border-color:rgba(124,92,191,.25);}
+.ac.claud{background:var(--surface2);color:#1a1f21;border-color:var(--border-strong);}
+.ac.gcl{background:rgba(0,168,107,.07);color:#004d30;border-color:rgba(0,168,107,.25);}
+
+.ho{font-size:12.5px;color:#1a1f21;margin-bottom:10px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.ho strong{color:#1a1f21;font-weight:500;}
+.kbd{display:inline-block;background:#fff;border:1px solid var(--border-strong);border-bottom:2px solid var(--border-strong);border-radius:4px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#1a1f21;line-height:1.7;}
+
+.cb{background:var(--fiord);border:1px solid #364f59;border-radius:10px;overflow:hidden;margin:11px 0;}
+.cbh{display:flex;align-items:center;justify-content:space-between;padding:8px 15px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18);}
+.cbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;}
+.cbl.t{color:var(--cerulean);}
+.cbl.b{color:#7dceff;}
+.cbl.p{color:#c4b4ef;}
+.cpb{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.4);background:none;border:1px solid rgba(255,255,255,.18);padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.cpb:hover{color:var(--cerulean);border-color:var(--cerulean);}
+.cpb.ok{color:#6fcf97;border-color:rgba(111,207,151,.4);}
+.cb pre{padding:13px 17px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.75;color:#c9d8e0;white-space:pre-wrap;word-break:break-all;}
+.cb pre .k{color:var(--cerulean);}
+.cb pre .s{color:#c3e88d;}
+.cb pre .c{color:rgba(255,255,255,.3);font-style:italic;}
+
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(0,150,239,.07);color:#003e85;padding:2px 6px;border-radius:4px;border:1px solid rgba(0,150,239,.14);}
+
+.ib{background:rgba(0,189,211,.05);border:1px solid rgba(0,189,211,.22);border-radius:9px;padding:13px 17px;margin:11px 0;font-size:13px;color:#005a66;}
+.wb{background:rgba(224,123,32,.05);border:1px solid rgba(224,123,32,.22);border-left:3px solid var(--orange);border-radius:9px;padding:13px 17px;margin:11px 0;font-size:13px;color:#6b3800;}
+.wb strong{color:#7a3f00;}
+.ob{background:rgba(0,168,107,.05);border:1px solid rgba(0,168,107,.22);border-left:3px solid var(--green);border-radius:9px;padding:13px 17px;margin:11px 0;font-size:13px;color:#003d22;}
+.eb{background:rgba(217,68,68,.04);border:1px solid rgba(217,68,68,.18);border-left:3px solid var(--red);border-radius:10px;padding:16px 20px;margin-bottom:12px;}
+.el{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.el::before{content:'⚠ ';font-size:12px;}
+.etitle{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#8b1f1f;margin-bottom:6px;}
+.emsg{font-family:'JetBrains Mono',monospace;font-size:11px;color:#9b2c2c;background:rgba(217,68,68,.06);border:1px solid rgba(217,68,68,.12);padding:9px 13px;border-radius:6px;margin:8px 0;line-height:1.6;word-break:break-all;}
+.sb{background:rgba(0,168,107,.04);border:1px solid rgba(0,168,107,.18);border-left:3px solid var(--green);border-radius:10px;padding:16px 20px;margin-bottom:12px;}
+.sl{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.sl::before{content:'✓';font-size:12px;}
+.stit{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#004d30;margin-bottom:6px;}
+
+.div{height:1px;background:var(--border);margin:32px 0;}
+
+.toc{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:24px;}
+.ta{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:7px;text-decoration:none;color:#1a1f21;font-size:13px;transition:all .15s;}
+.ta:hover{border-color:var(--copper);color:#004fa3;text-decoration:none;}
+.tn{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--copper);font-weight:600;min-width:20px;}
+
+.ps{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(66,90,99,.06);}
+.psh{padding:20px 26px;border-bottom:1px solid var(--border);}
+.psh h2{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#1a1f21;}
+.psh p{font-size:13px;color:#1a1f21;margin-top:3px;}
+.psg{padding:18px 26px;display:grid;gap:9px;}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.pc:hover{border-color:var(--copper);box-shadow:0 0 0 3px rgba(0,150,239,.07);}
+.pt{font-size:13px;color:#1a1f21;font-style:italic;flex:1;line-height:1.5;}
+.pm{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.pmcp{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;white-space:nowrap;}
+.pmcp.d{background:rgba(0,189,211,.1);color:#007a8a;border:1px solid rgba(0,189,211,.25);}
+.pmcp.m{background:rgba(0,150,239,.1);color:#004fa3;border:1px solid rgba(0,150,239,.25);}
+.pmcp.bth{background:rgba(124,92,191,.1);color:#5b3fa6;border:1px solid rgba(124,92,191,.25);}
+.pcp{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+
+.bf{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+.bfc{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.bfc h4{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#1a1f21;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.bfc p{font-size:13px;color:#1a1f21;}
+.fbdg{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;}
+.fbdg.d{background:rgba(0,189,211,.12);color:#007a8a;border:1px solid rgba(0,189,211,.3);}
+.fbdg.m{background:rgba(0,150,239,.12);color:#004fa3;border:1px solid rgba(0,150,239,.3);}
+
+.fin{background:linear-gradient(135deg,rgba(0,150,239,.06),rgba(0,189,211,.04));border:1px solid rgba(0,150,239,.2);border-radius:14px;padding:28px 32px;margin-top:32px;text-align:center;}
+.fin h2{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#1a1f21;margin-bottom:8px;}
+.fin p{color:#1a1f21;font-size:14px;max-width:500px;margin:0 auto;}
+
+@media(max-width:640px){
+  .hero,.wrap{padding-left:18px;padding-right:18px;}
+  .tab-bar-inner{padding:0 8px;overflow-x:auto;}
+  .tb{padding:12px 12px;font-size:13px;}
+  .bf{grid-template-columns:1fr;}
+  .toc{flex-direction:column;}
+}
+
+/* ===== gsc-multi Step 03 wizard ===== */
+.macc{border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;background:#fbfbfd;transition:background .2s,border-color .2s;}
+.macc.done{background:#f0fdf4;border-color:#86efac;}
+.macc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap;}
+.macc-hd h4{margin:0;font-family:'Syne',sans-serif;font-size:14px;color:var(--copper);font-weight:700;}
+.macc.done .macc-hd h4{color:var(--green);}
+.macc-done{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;margin:0;font-weight:normal;cursor:pointer;}
+.macc-lbl{display:block;font-weight:500;margin-top:10px;margin-bottom:3px;font-size:12.5px;color:#1a1f21;}
+.macc-lbl small{color:var(--muted);font-size:11px;font-weight:normal;}
+.macc-in{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-size:13px;font-family:'JetBrains Mono',monospace;background:#fff;color:#1a1f21;}
+.macc-in:focus{outline:none;border-color:var(--copper);box-shadow:0 0 0 3px rgba(0,150,239,.08);}
+.macc-cmd-lbl{margin:12px 0 4px;font-size:12.5px;font-weight:600;color:#1a1f21;}
+.macc-url{position:relative;background:#f1f5f9;border:1px solid var(--border);padding:8px 56px 8px 11px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#334155;word-break:break-all;margin:4px 0;line-height:1.55;}
+.macc-url .cpb{position:absolute;top:6px;right:6px;color:#334155;background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.14);}
+.macc-url .cpb:hover{color:var(--copper);border-color:var(--copper);}
+.macc-note{margin-top:6px;font-size:11.5px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Windows Setup Guide &mdash; Dual MCP</div>
+  <h1>Google Search Console<br><span>Dual MCP for Claude Desktop</span></h1>
+  <p class="hero-sub">Two MCP servers running side by side &mdash; deep per-site analytics AND multi-account management, both accessible in a single Claude Desktop chat.</p>
+  <div class="hero-pills">
+    <div class="hp d"><span class="dot"></span> gsc-deep &mdash; Deep analytics via uvx + OAuth credentials</div>
+    <div class="hp m"><span class="dot"></span> gsc-multi &mdash; Multi-account via node, built-in OAuth</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <div class="tab-bar-inner">
+    <button class="tb ad" id="tb-deep" onclick="sw('deep')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      MCP Deep <span class="tb-bdg">gsc-deep</span>
+    </button>
+    <button class="tb" id="tb-multi" onclick="sw('multi')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      MCP Multi Accounts <span class="tb-bdg">gsc-multi</span>
+    </button>
+    <button class="tb" id="tb-both" onclick="sw('both')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Both MCPs Together <span class="tb-bdg">combined</span>
+    </button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ========================== PLACEHOLDER LEGEND (shown on every tab) ========================== -->
+<div class="wb" style="margin-bottom:20px;">
+  <strong>Before you start &mdash; three placeholders you must replace in the snippets below:</strong>
+  <ul style="margin-top:8px;margin-bottom:0;padding-left:22px;">
+    <li><code>YOUR_USERNAME</code> &mdash; your Windows username. Open Command Prompt and run <code>echo %USERNAME%</code> to find it. The username goes into every path that starts with <code>C:\Users\</code>.</li>
+    <li><code>your-google-email@gmail.com</code> &mdash; the Gmail you want to authenticate with Google Search Console. Use the same address you use when signing into <a href="https://search.google.com/search-console" target="_blank">search.google.com/search-console</a>.</li>
+    <li><code>YOUR_ALIAS</code> &mdash; (gsc-multi only) the short nickname you give each Google account when running <code>gsc-mcp-auth --alias &lt;name&gt;</code>. Lowercase letters, digits, hyphens, underscores only &mdash; no spaces, no <code>@</code>. Example aliases: <code>account1</code>, <code>client-acme</code>, <code>personal</code>.</li>
+  </ul>
+  <p style="margin-top:10px;margin-bottom:0;font-size:12.5px;"><strong>Important:</strong> the JSON config file does <em>not</em> expand environment variables &mdash; <code>%USERPROFILE%</code> and <code>~</code> are interpreted literally. You must write the full path with your real username.</p>
+</div>
+
+<!-- ========================== PANEL: gsc-deep ========================== -->
+<div class="panel show" id="panel-deep">
+  <div class="toc">
+    <a href="#d1" class="ta"><span class="tn">01</span> Node.js</a>
+    <a href="#d2" class="ta"><span class="tn">02</span> Google Cloud Credentials</a>
+    <a href="#d3" class="ta"><span class="tn">03</span> Install uv</a>
+    <a href="#d4" class="ta"><span class="tn">04</span> Edit Config File</a>
+    <a href="#d5" class="ta"><span class="tn">05</span> Trigger OAuth</a>
+    <a href="#derr" class="ta"><span class="tn" style="color:var(--red)">⚠ </span> Errors</a>
+    <a href="#dprompts" class="ta"><span class="tn">✦</span> Test Prompts</a>
+  </div>
+
+  <div class="cfg-ban">
+    <h3>&#9881; Config for gsc-deep only</h3>
+    <p class="csub">If you are setting up both MCPs, switch to the <strong>Both MCPs Together</strong> tab for the combined config instead.</p>
+    <div class="cb">
+      <div class="cbh"><span class="cbl t">claude_desktop_config.json</span><button class="cpb" id="dcpy" onclick="cDeep()">Copy</button></div>
+      <pre>{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"gsc-deep"</span>: {
+      <span class="c">// Deep analytics MCP — requires uvx + client_secrets.json</span>
+      <span class="k">"command"</span>: <span class="s">"C:\\Users\\YOUR_USERNAME\\.local\\bin\\uvx.exe"</span>,
+      <span class="k">"args"</span>: [<span class="s">"mcp-search-console"</span>],
+      <span class="k">"env"</span>: {
+        <span class="k">"GSC_OAUTH_CLIENT_SECRETS_FILE"</span>: <span class="s">"C:\\Users\\YOUR_USERNAME\\Documents\\client_secrets.json"</span>
+      }
+    }
+  }
+}</pre>
+    </div>
+    <div class="wb" style="margin-top:10px;margin-bottom:0;"><strong>Windows JSON rule:</strong> Every backslash must be doubled: <code>\</code> becomes <code>\\</code>. Spaces in folder names are fine. Use straight quotes <code>"</code> only, never curly ones.</div>
+  </div>
+
+  <div class="section" id="d1">
+    <div class="shd"><div class="sn t">Step 01</div><div><div class="stitle">Install Node.js</div><div class="ssub">Required on this PC. Install once — used by both MCPs.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Download and install from the official website</div>
+      <span class="ac brws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Chrome or Edge browser</span>
+      <p style="margin-top:8px;">Go to <a href="https://nodejs.org" target="_blank">nodejs.org</a> and download the <strong>LTS version</strong>. Run the installer keeping all default options. Node.js also installs <code>npm</code> automatically.</p>
+      <p style="margin-top:14px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Verify install</p>
+      <span class="ac cmd" style="margin-top:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Command Prompt (cmd.exe)</span>
+      <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">cmd</span> &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl">cmd</span><button class="cpb" onclick="cp(this,'node --version\nnpm --version')">Copy</button></div><pre>node --version
+npm --version</pre></div>
+      <p>You should see two version numbers. If you see "not recognized", restart your PC and try again.</p>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="d2">
+    <div class="shd"><div class="sn t">Step 02</div><div><div class="stitle">Create Google Cloud Credentials</div><div class="ssub">No terminal needed. Done entirely in a browser. Required only for gsc-deep.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Create OAuth credentials in Google Cloud Console</div>
+      <span class="ac gcl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Browser &mdash; console.cloud.google.com</span>
+      <ol style="margin-top:10px;">
+        <li>Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> and create or select a project</li>
+        <li>Search for <strong>Search Console API</strong> at the top, click it, then click <strong>Enable</strong></li>
+        <li>Left sidebar: <strong>APIs &amp; Services &rarr; Credentials &rarr; Create Credentials &rarr; OAuth client ID</strong></li>
+        <li>If prompted, set up the OAuth consent screen first: choose <strong>External</strong>, fill any app name, save</li>
+        <li>For Application type choose <strong>Desktop app</strong>, give it any name, click <strong>Create</strong></li>
+        <li>Click <strong>Download JSON</strong> and save to this exact path:</li>
+      </ol>
+      <div class="cb"><div class="cbh"><span class="cbl">save file to this path</span><button class="cpb" onclick="cp(this,'C:\\Users\\YOUR_USERNAME\\Documents\\client_secrets.json')">Copy path</button></div><pre>C:\Users\YOUR_USERNAME\Documents\client_secrets.json</pre></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Add your Google account as a Test User</div>
+      <p style="margin-bottom:10px;">Required if your consent screen is in "Testing" mode. Without this you will get a 403 error when signing in.</p>
+      <span class="ac gcl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Browser &mdash; Google Cloud Console</span>
+      <ol style="margin-top:10px;">
+        <li>Left sidebar: <strong>APIs &amp; Services &rarr; OAuth consent screen</strong> (newer UI: <strong>Google Auth Platform &rarr; Audience</strong>)</li>
+        <li>Scroll to <strong>Test users</strong> section &rarr; click <strong>+ Add Users</strong></li>
+        <li>Enter <code>your-google-email@gmail.com</code> and click <strong>Save</strong></li>
+      </ol>
+      <div class="ob">You do not need Google to verify your app. Adding yourself as a test user is the complete fix for all 403 errors.</div>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="d3">
+    <div class="shd"><div class="sn t">Step 03</div><div><div class="stitle">Install uv &mdash; the Python package runner</div><div class="ssub">gsc-deep runs via uvx. Command Prompt only. Run as Administrator.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Open Command Prompt as Administrator and run the installer</div>
+      <span class="ac cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Command Prompt &mdash; Run as Administrator</span>
+      <div class="ho"><strong>How to open as Admin:</strong> Press <span class="kbd">Win</span>, type <span class="kbd">cmd</span>, right-click <strong>Command Prompt</strong> &rarr; <strong>Run as administrator</strong>, click Yes</div>
+      <div class="cb"><div class="cbh"><span class="cbl">cmd (admin)</span><button class="cpb" onclick="cp(this,'powershell -ExecutionPolicy ByPass -c \"irm https://astral.sh/uv/install.ps1 | iex\"')">Copy</button></div><pre>powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"</pre></div>
+      <p>Wait for "uv is installed successfully". Then <strong>close Command Prompt completely and reopen it</strong> &mdash; required for the path to update.</p>
+    </div>
+    <div class="card">
+      <div class="ctitle">Verify and find the exact uvx.exe path</div>
+      <span class="ac cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>New Command Prompt window</span>
+      <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">cmd</span> &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl">cmd</span><button class="cpb" onclick="cp(this,'uv --version')">Copy</button></div><pre>uv --version</pre></div>
+      <p style="margin-bottom:9px;">Find the exact path to uvx.exe (needed for the config):</p>
+      <div class="cb"><div class="cbh"><span class="cbl">cmd</span><button class="cpb" onclick="cp(this,'where.exe uvx')">Copy</button></div><pre>where.exe uvx</pre></div>
+      <div class="ib">This prints a path like <code>C:\Users\YOUR_USERNAME\.local\bin\uvx.exe</code>. That exact path is already filled in the config at the top. If yours is different, update the config before saving.</div>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="d4">
+    <div class="shd"><div class="sn t">Step 04</div><div><div class="stitle">Edit the Claude Desktop Config File</div><div class="ssub">File Explorer + Notepad. No terminal needed.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Open the Claude config folder in File Explorer</div>
+      <span class="ac expl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Windows File Explorer</span>
+      <div class="ho"><strong>Fastest way:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span>, paste this path, press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl">Win+R Run dialog</span><button class="cpb" onclick="cp(this,'%APPDATA%\\Claude')">Copy</button></div><pre>%APPDATA%\Claude</pre></div>
+      <p>Look for <code>claude_desktop_config.json</code>. If it does not exist: right-click empty space &rarr; <strong>New &rarr; Text Document</strong> &rarr; rename it to exactly <code>claude_desktop_config.json</code>.</p>
+    </div>
+    <div class="card">
+      <div class="ctitle">Edit in Notepad</div>
+      <span class="ac npad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Notepad (built into Windows)</span>
+      <div class="ho"><strong>How:</strong> Right-click <code>claude_desktop_config.json</code> &rarr; <strong>Open with</strong> &rarr; <strong>Notepad</strong></div>
+      <ol><li>Press <span class="kbd">Ctrl</span> + <span class="kbd">A</span> to select all existing content and delete it</li><li>Copy the config from the blue panel at the top of this page</li><li>Paste with <span class="kbd">Ctrl</span> + <span class="kbd">V</span> and save with <span class="kbd">Ctrl</span> + <span class="kbd">S</span></li></ol>
+    </div>
+    <div class="card">
+      <div class="ctitle">Fully restart Claude Desktop</div>
+      <span class="ac claud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>Claude Desktop &mdash; system tray</span>
+      <div class="wb" style="margin-top:9px;"><strong>Do NOT just close the Claude window.</strong> Find the Claude icon in the <strong>system tray</strong> at the bottom-right of your screen (near the clock). Right-click it &rarr; <strong>Quit</strong>. Then reopen Claude Desktop. Only a full quit reloads the MCP config.</div>
+      <p style="margin-top:12px;font-size:13px;"><strong>If tray Quit leaves leftover processes</strong> &mdash; sometimes Claude leaves background <code>Claude.exe</code> processes running even after Quit. Force-kill all of them from Command Prompt:</p>
+      <div class="cb"><div class="cbh"><span class="cbl">cmd</span><button class="cpb" onclick="cp(this,'taskkill /F /IM Claude.exe')">Copy</button></div><pre>taskkill /F /IM Claude.exe</pre></div>
+      <p style="font-size:13px;">You will see one "SUCCESS" line per process. Then reopen Claude Desktop from the Start menu.</p>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="d5">
+    <div class="shd"><div class="sn t">Step 05</div><div><div class="stitle">Trigger OAuth &mdash; Connect Your Google Account</div><div class="ssub">Done inside Claude Desktop chat. Browser opens automatically.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Trigger authentication from Claude Desktop chat</div>
+      <span class="ac claud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>Claude Desktop &mdash; type in chat</span>
+      <div class="cb" style="margin-top:10px;"><div class="cbh"><span class="cbl t">claude prompt</span><button class="cpb" onclick="cp(this,'Call reauthenticate')">Copy</button></div><pre>Call reauthenticate</pre></div>
+      <span class="ac brws" style="margin-top:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Browser opens automatically</span>
+      <ol style="margin-top:8px;"><li>Select the Google account you added as a test user in Step 02 (e.g. <code>your-google-email@gmail.com</code>)</li><li>Click <strong>Allow</strong> on the permissions screen</li><li>Wait for "Authentication successful" in the browser before closing it</li><li>gsc-deep is now connected. You do not need to include the account email in any prompts &mdash; just mention the domain.</li></ol>
+    </div>
+    <div class="card">
+      <div class="ctitle">Alternative: trigger from Command Prompt if browser did not open</div>
+      <span class="ac cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Command Prompt (cmd.exe)</span>
+      <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">cmd</span> &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl">cmd</span><button class="cpb" onclick="cp(this,'\"C:\\Users\\YOUR_USERNAME\\.local\\bin\\uvx.exe\" mcp-search-console')">Copy</button></div><pre>"C:\Users\YOUR_USERNAME\.local\bin\uvx.exe" mcp-search-console</pre></div>
+      <p>Complete the Google sign-in in the browser that opens. Then close Command Prompt and restart Claude Desktop from the system tray.</p>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="derr">
+    <div class="shd"><div class="sn e">Errors</div><div><div class="stitle">Common Errors for gsc-deep</div><div class="ssub">Real errors encountered during setup with exact fixes</div></div></div>
+    <div class="eb"><div class="el">Error 01 &mdash; JSON Parse</div><div class="etitle">Could not load app settings</div><div class="emsg">There was an error reading or parsing claude_desktop_config.json: Unexpected non-whitespace character after JSON at position 762</div></div>
+    <div class="sb"><div class="sl">Fix</div><div class="stit">Syntax error in config &mdash; likely smart quotes or single backslashes</div><ol><li>Open config via <span class="kbd">Win</span>+<span class="kbd">R</span> &rarr; <code>%APPDATA%\Claude</code></li><li>Select all &rarr; delete &rarr; paste fresh config from the top of this panel</li><li>Use straight quotes <code>"</code> only, and double every backslash: <code>\</code> becomes <code>\\</code></li><li>Validate at <a href="https://jsonlint.com" target="_blank">jsonlint.com</a> if unsure</li><li>Save &rarr; quit Claude from system tray &rarr; reopen</li></ol></div>
+    <div class="eb"><div class="el">Error 02 &mdash; Google 403</div><div class="etitle">Access blocked: app not verified</div><div class="emsg">Error 403: access_denied &mdash; The app is currently being tested and can only be accessed by developer-approved testers.</div></div>
+    <div class="sb"><div class="sl">Fix</div><div class="stit">Your Google account is not added as a test user</div><p style="font-size:13px;color:#1a1f21;">Go back to Step 02 and add <code>your-google-email@gmail.com</code> as a test user in the OAuth consent screen. That is the complete fix.</p></div>
+    <div class="eb"><div class="el">Error 03 &mdash; GSC Timeout</div><div class="etitle">The GSC tool timed out</div><div class="emsg">This is likely because the local MCP server is not responding.</div></div>
+    <div class="sb"><div class="sl">Fix</div><div class="stit">OAuth login was never completed &mdash; no token was saved</div><span class="ac claud" style="margin-top:8px;display:inline-flex;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>Claude Desktop &mdash; type in chat</span><div class="cb" style="margin-top:8px;"><div class="cbh"><span class="cbl t">claude prompt</span></div><pre>Call reauthenticate</pre></div><p style="font-size:13px;color:#1a1f21;">Complete the full Google login. Do not close the browser early.</p></div>
+    <div class="eb"><div class="el">Error 04 &mdash; Invalid JSON Escape</div><div class="etitle">1 validation error for JSONRPCMessage &mdash; Invalid JSON escape</div><div class="emsg">Invalid JSON: invalid escape at line 1 column 5 [type=json_invalid, input_value='"C:\\Users\\Vishal Kumar...']</div></div>
+    <div class="sb"><div class="sl">Fix</div><div class="stit">When running from Command Prompt, wrap the full path in quotes</div><div class="cb" style="margin-top:8px;"><div class="cbh"><span class="cbl">cmd &mdash; correct way</span><button class="cpb" onclick="cp(this,'\"C:\\Users\\YOUR_USERNAME\\.local\\bin\\uvx.exe\" mcp-search-console')">Copy</button></div><pre>"C:\Users\YOUR_USERNAME\.local\bin\uvx.exe" mcp-search-console</pre></div></div>
+  </div>
+  <div class="div"></div>
+
+  <div id="dprompts">
+    <div class="ps">
+      <div class="psh"><h2>&#9679; Test Prompts &mdash; gsc-deep</h2><p>gsc-deep is connected to a single Google account. You do not need to mention the account email &mdash; just mention the domain. Replace <code>domain.com</code> with your actual site.</p></div>
+      <div class="psg">
+        <div class="pc" onclick="cpP(this,'Call reauthenticate')"><span class="pt">"Call reauthenticate" &mdash; triggers Google OAuth browser login for gsc-deep, run this first</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, list all my Google Search Console properties.')"><span class="pt">"Using gsc-deep, list all my Google Search Console properties."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, check whether domain.com exists in Search Console and show the access level.')"><span class="pt">"Using gsc-deep, check whether domain.com exists in Search Console and show the access level."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, check the property for domain.com and show the last 28 days traffic comparison vs previous 28 days.')"><span class="pt">"Using gsc-deep, check the property for domain.com and show the last 28 days traffic comparison vs previous 28 days."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, show top queries, pages, countries, and devices for domain.com for the last 30 days.')"><span class="pt">"Using gsc-deep, show top queries, pages, countries, and devices for domain.com for the last 30 days."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, find keywords ranking in positions 11 to 20 with more than 500 impressions for domain.com — quick win opportunities.')"><span class="pt">"Using gsc-deep, find keywords in positions 11–20 with 500+ impressions for domain.com (quick wins)."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, find pages on domain.com with CTR below 2% and suggest better title tags.')"><span class="pt">"Using gsc-deep, find pages on domain.com with CTR below 2% and suggest better title tags."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, audit sitemaps for domain.com and show any errors or warnings.')"><span class="pt">"Using gsc-deep, audit sitemaps for domain.com and show any errors or warnings."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-deep, check if the homepage of domain.com is indexed and show any mobile usability issues.')"><span class="pt">"Using gsc-deep, check if the homepage of domain.com is indexed and show any mobile usability issues."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================== PANEL: gsc-multi ========================== -->
+<div class="panel" id="panel-multi">
+  <div class="toc">
+    <a href="#m1" class="ta"><span class="tn">01</span> Node.js</a>
+    <a href="#m2" class="ta"><span class="tn">02</span> Install Package</a>
+    <a href="#m3" class="ta"><span class="tn">03</span> Authenticate Accounts</a>
+    <a href="#m4" class="ta"><span class="tn">04</span> Edit Config File</a>
+    <a href="#m5" class="ta"><span class="tn">05</span> Restart Claude</a>
+    <a href="#mprompts" class="ta"><span class="tn">✦</span> Test Prompts</a>
+  </div>
+
+  <div class="cfg-ban">
+    <h3>&#9881; Config for gsc-multi only</h3>
+    <p class="csub">If you are setting up both MCPs, switch to the <strong>Both MCPs Together</strong> tab for the combined config instead.</p>
+    <div class="cb">
+      <div class="cbh"><span class="cbl b">claude_desktop_config.json</span><button class="cpb" id="mcpy" onclick="cMulti()">Copy</button></div>
+      <pre>{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"gsc-multi"</span>: {
+      <span class="c">// Multi-account MCP — built-in OAuth, no credentials file needed</span>
+      <span class="k">"command"</span>: <span class="s">"node"</span>,
+      <span class="k">"args"</span>: [
+        <span class="s">"C:\\Users\\YOUR_USERNAME\\AppData\\Roaming\\npm\\node_modules\\google-searchconsole-mcp\\dist\\index.js"</span>
+      ]
+    }
+  }
+}</pre>
+    </div>
+  </div>
+
+  <div class="section" id="m1">
+    <div class="shd"><div class="sn b">Step 01</div><div><div class="stitle">Install Node.js</div><div class="ssub">gsc-multi runs entirely on Node.js. Required before anything else.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Download and install from the official website</div>
+      <span class="ac brws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Chrome or Edge browser</span>
+      <p style="margin-top:8px;">Visit <a href="https://nodejs.org" target="_blank">nodejs.org</a> and download the <strong>LTS version</strong>. Run the installer with all defaults. When asked about "Automatically install necessary tools", check that box.</p>
+      <p style="margin-top:14px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Verify in Command Prompt</p>
+      <span class="ac cmd" style="margin-top:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Command Prompt (cmd.exe)</span>
+      <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">cmd</span> &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl b">cmd</span><button class="cpb" onclick="cp(this,'node --version\nnpm --version')">Copy</button></div><pre>node --version
+npm --version</pre></div>
+      <p>You should see two version numbers. If you see "not recognized", restart your PC and try again.</p>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="m2">
+    <div class="shd"><div class="sn b">Step 02</div><div><div class="stitle">Install the google-searchconsole-mcp Package</div><div class="ssub">One npm command. No Google Cloud account or API keys needed.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Run in Command Prompt</div>
+      <span class="ac cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Command Prompt (cmd.exe)</span>
+      <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">cmd</span> &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl b">cmd</span><button class="cpb" onclick="cp(this,'npm install -g google-searchconsole-mcp')">Copy</button></div><pre>npm install -g google-searchconsole-mcp</pre></div>
+      <div class="wb" style="margin-top:10px;"><strong>If you opened PowerShell instead of Command Prompt</strong> and see <em>"running scripts is disabled on this system"</em> when you run <code>npm</code> or <code>gsc-mcp-auth</code> later, the PowerShell <code>.ps1</code> shim is blocked by your execution policy. Two fixes:
+        <ul style="margin-top:8px;margin-bottom:0;padding-left:22px;">
+          <li><strong>Easiest:</strong> use Command Prompt (<code>cmd.exe</code>) instead of PowerShell &mdash; the <code>.cmd</code> shims aren't subject to the policy. All commands in this guide are written for <code>cmd.exe</code>.</li>
+          <li><strong>Or relax the policy for your user only:</strong> open PowerShell and run <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> &mdash; type <code>Y</code> when prompted.</li>
+        </ul>
+      </div>
+      <div class="ob">This package ships with built-in OAuth credentials. You do NOT need a Google Cloud project or any API keys. Just install and authenticate.</div>
+      <p style="margin-top:10px;">Verify the install worked:</p>
+      <div class="cb"><div class="cbh"><span class="cbl b">cmd &mdash; same window</span><button class="cpb" onclick="cp(this,'gsc-mcp-auth --version')">Copy</button></div><pre>gsc-mcp-auth --version</pre></div>
+      <p>If you see a version number, it worked. The package installs to:</p>
+      <div class="cb"><div class="cbh"><span class="cbl">installed location</span></div><pre>C:\Users\YOUR_USERNAME\AppData\Roaming\npm\node_modules\google-searchconsole-mcp\dist\index.js</pre></div>
+      <div class="ib">That exact path is already in the config block at the top of this panel.</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Apply the default patch &mdash; show access levels in <code>list_sites</code></div>
+      <p>By default, <code>list_sites</code> only prints URLs. This one-time patch (3 string replacements across 2 files inside the installed package) annotates each site with its access level: <code>[siteOwner]</code> / <code>[siteFullUser]</code> / <code>[siteRestrictedUser]</code> / <code>[siteUnverifiedUser]</code>. <strong>Run it now &mdash; the rest of this guide assumes it's applied.</strong></p>
+      <span class="ac cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>PowerShell &mdash; paste the whole block and press Enter</span>
+      <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">powershell</span> &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl b">powershell &mdash; multi-line paste</span><button class="cpb" onclick="cp(this, document.getElementById('patchPS').textContent)">Copy</button></div><pre id="patchPS">$d="$env:APPDATA\npm\node_modules\google-searchconsole-mcp\dist"
+$a=Get-Content "$d\tools\search-analytics.js" -Raw
+$findA='        \.map\(\(site\) => site\.siteUrl\)\r?\n        \.filter\(\(url\) => url !== undefined\);'
+$replA="        .filter((site) => site.siteUrl !== undefined)`r`n        .map((site) => ({`r`n            siteUrl: site.siteUrl,`r`n            permissionLevel: site.permissionLevel || ""Unknown"",`r`n        }));"
+$a=[regex]::Replace($a,$findA,$replA)
+Set-Content "$d\tools\search-analytics.js" -Value $a -NoNewline
+$b=Get-Content "$d\index.js" -Raw
+$b=$b.Replace('sites.forEach((s) => lines.push(`  - ${s}`));','sites.forEach((s) => lines.push(`  - ${s.siteUrl}  [${s.permissionLevel}]`));')
+$b=$b.Replace('sites.map((s) => `- ${s}`)','sites.map((s) => `- ${s.siteUrl}  [${s.permissionLevel}]`)')
+Set-Content "$d\index.js" -Value $b -NoNewline
+"Patch applied. The change takes effect after Claude Desktop is fully restarted."</pre></div>
+      <div class="ob" style="margin-top:8px;"><strong>Expected output:</strong> the line <em>"Patch applied. The change takes effect after Claude Desktop is fully restarted."</em></div>
+      <div class="ib" style="margin-top:8px;"><strong>Safe to re-run.</strong> The script is idempotent &mdash; running it twice does nothing the second time. If you ever run <code>npm update -g google-searchconsole-mcp</code> the patch is overwritten, so paste this same block again afterward.</div>
+      <div class="wb" style="margin-top:8px;"><strong>If PowerShell refuses to run anything</strong> due to execution policy, this paste-and-run pattern is still allowed (it's an interactive command, not a script file). The blocked variant is double-clicking a <code>.ps1</code> file. If you still hit issues, run <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once and retry.</div>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="m3">
+    <div class="shd"><div class="sn b">Step 03</div><div><div class="stitle">Authenticate Your Google Account(s)</div><div class="ssub">Run once per account in Command Prompt. Browser opens for Google login automatically.</div></div></div>
+    <div class="card">
+      <div class="ctitle">&#9888; Browser hygiene &mdash; do this first or you'll authenticate the wrong account</div>
+      <span class="ac brws"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Chrome or Edge &mdash; Incognito / InPrivate window</span>
+      <div class="wb" style="margin-top:9px;"><strong>Gotcha:</strong> Google silently uses whichever Gmail you're already signed into in your browser. If you run <code>gsc-mcp-auth --alias personal</code> while signed in as your work Gmail, the helper saves the work account under the <code>personal</code> alias. The bug is invisible &mdash; the auth succeeds &mdash; you only notice when the data is wrong.</div>
+      <p style="margin-top:10px;"><strong>Pick one before each <code>gsc-mcp-auth</code> command:</strong></p>
+      <ol style="margin-top:6px;">
+        <li><strong>Easiest:</strong> open an <strong>Incognito</strong> (Chrome) or <strong>InPrivate</strong> (Edge) window. <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">N</span> in Chrome, Edge and <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">P</span> in Mozilla.</li>
+        <li><strong>Alternative:</strong> go to <a href="https://accounts.google.com/Logout" target="_blank">accounts.google.com/Logout</a> first to sign out of all Google accounts in your normal browser.</li>
+      </ol>
+      <div class="ib" style="margin-top:10px;">After the helper prints <code>"Account email: ..."</code> in Command Prompt, verify it matches the Gmail you intended. If it shows the wrong email, delete the token file at <code>C:\Users\YOUR_USERNAME\.gsc-mcp\tokens\&lt;alias&gt;.json</code> and re-run with a clean browser.</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Single account</div>
+      <span class="ac cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Command Prompt (cmd.exe)</span>
+      <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">cmd</span> &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl b">cmd</span><button class="cpb" onclick="cp(this,'gsc-mcp-auth')">Copy</button></div><pre>gsc-mcp-auth</pre></div>
+      <span class="ac brws" style="margin-top:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Browser opens automatically for Google login</span>
+      <p style="margin-top:8px;">Log in with <code>your-google-email@gmail.com</code>. Click Allow. Once confirmed, return to Command Prompt. Tokens save locally at <code>C:\Users\YOUR_USERNAME\.gsc-mcp\tokens\</code>.</p>
+    </div>
+    <div class="card">
+      <div class="ctitle">Multiple accounts &mdash; interactive wizard</div>
+      <p>Tell the wizard how many Google accounts you want to add. It generates the exact command + a targeted auth URL (with <code>login_hint</code> pre-filled) for each one. The alias is auto-derived from the email's local-part &mdash; edit it inline if you want a custom nickname.</p>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;">
+        <label for="numMultiAccounts" style="font-weight:600;font-size:13px;margin:0;">Number of accounts:</label>
+        <input type="number" id="numMultiAccounts" min="1" max="50" value="3" style="width:90px;padding:7px 10px;border:1px solid var(--border-strong);border-radius:5px;font-size:14px;font-family:'JetBrains Mono',monospace;background:#fff;">
+        <button onclick="genMultiAccounts()" style="background:var(--copper);color:white;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:.02em;">Generate steps &rarr;</button>
+      </div>
+
+      <div id="multiAccountsList" style="margin-top:18px;"></div>
+      <div id="multiSummary" style="display:none;margin-top:10px;font-size:13px;background:rgba(0,168,107,.06);border:1px solid rgba(0,168,107,.25);padding:9px 14px;border-radius:7px;color:#003d22;"><strong id="multiSummaryText">0 of 0 accounts marked done.</strong> Tick each card as you finish so you can resume mid-list.</div>
+
+      <p style="margin-top:18px;">Confirm at any point that every alias is bound to the right Gmail:</p>
+      <div class="cb"><div class="cbh"><span class="cbl b">cmd</span><button class="cpb" onclick="cp(this,'gsc-mcp-auth --list')">Copy</button></div><pre>gsc-mcp-auth --list</pre></div>
+      <div class="ib" style="margin-top:8px;">If any alias shows the wrong email, delete its token file at <code>C:\Users\YOUR_USERNAME\.gsc-mcp\tokens\&lt;alias&gt;.json</code> and re-run that account's auth command in a fresh incognito window.</div>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="m4">
+    <div class="shd"><div class="sn b">Step 04</div><div><div class="stitle">Edit the Claude Desktop Config File</div><div class="ssub">File Explorer + Notepad. No terminal needed.</div></div></div>
+    <div class="card">
+      <div class="ctitle">Open the Claude config folder</div>
+      <span class="ac expl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Windows File Explorer</span>
+      <div class="ho"><strong>How:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; paste path &rarr; press <span class="kbd">Enter</span></div>
+      <div class="cb"><div class="cbh"><span class="cbl">Win+R Run dialog</span><button class="cpb" onclick="cp(this,'%APPDATA%\\Claude')">Copy</button></div><pre>%APPDATA%\Claude</pre></div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Edit in Notepad</div>
+      <span class="ac npad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Notepad</span>
+      <div class="ho"><strong>How:</strong> Right-click <code>claude_desktop_config.json</code> &rarr; <strong>Open with</strong> &rarr; <strong>Notepad</strong></div>
+      <ol><li>Press <span class="kbd">Ctrl</span> + <span class="kbd">A</span> to select all, then delete</li><li>Copy the config from the blue panel at the top of this page</li><li>Paste with <span class="kbd">Ctrl</span> + <span class="kbd">V</span> and save with <span class="kbd">Ctrl</span> + <span class="kbd">S</span></li></ol>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="section" id="m5">
+    <div class="shd"><div class="sn b">Step 05</div><div><div class="stitle">Fully Restart Claude Desktop</div><div class="ssub">Must quit from system tray, not just close the window</div></div></div>
+    <div class="card">
+      <div class="ctitle">Quit from system tray and reopen</div>
+      <span class="ac claud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>Claude Desktop &mdash; Windows system tray</span>
+      <div class="wb" style="margin-top:9px;"><strong>Critical:</strong> Bottom-right of screen near the clock. Find the Claude icon. Right-click &rarr; <strong>Quit</strong>. Reopen Claude Desktop from the Start menu. Only a full quit reloads the MCP config.</div>
+      <p style="margin-top:12px;font-size:13px;"><strong>If tray Quit leaves leftover processes</strong> &mdash; force-kill all <code>Claude.exe</code> processes from Command Prompt, then reopen Claude Desktop:</p>
+      <div class="cb"><div class="cbh"><span class="cbl b">cmd</span><button class="cpb" onclick="cp(this,'taskkill /F /IM Claude.exe')">Copy</button></div><pre>taskkill /F /IM Claude.exe</pre></div>
+      <div class="ob" style="margin-top:10px;">Once Claude restarts, gsc-multi is live. Test it using the prompts below.</div>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div id="mprompts">
+    <div class="ps">
+      <div class="psh"><h2>&#9679; Test Prompts &mdash; gsc-multi</h2><p>gsc-multi is connected to multiple Google accounts. Always mention both the <strong>account email</strong> and the <strong>domain</strong> in your prompt. Replace <code>domain.com</code> with your actual site.</p></div>
+      <div class="psg">
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, list all Search Console properties with access levels.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, list all Search Console properties with access levels."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, check whether domain.com exists in Search Console and show the permission level.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, check whether domain.com exists in Search Console and show the permission level."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, show the top 20 queries by clicks for domain.com for the last 30 days.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, show the top 20 queries by clicks for domain.com for the last 30 days."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, compare the last 28 days vs previous 28 days traffic for domain.com.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, compare the last 28 days vs previous 28 days traffic for domain.com."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, show top pages and queries for domain.com based on clicks and impressions.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, show top pages and queries for domain.com based on clicks and impressions."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, find keywords with high impressions but low CTR for domain.com and suggest title improvements.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, find keywords with high impressions but low CTR for domain.com and suggest title improvements."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, find pages on domain.com ranking in position 11 to 20 with more than 300 impressions — quick win opportunities.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, find pages on domain.com in position 11–20 with 300+ impressions (quick wins)."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+        <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, create a full SEO report for domain.com for last 30 days: top queries, top pages, CTR distribution, and position averages.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, create a full SEO report for domain.com for last 30 days: top queries, top pages, CTR and position averages."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="shd"><div class="sn b">Remember</div><div><div class="stitle">gsc-multi cheat sheet</div><div class="ssub">Two rules to keep in mind every time you use gsc-multi.</div></div></div>
+    <div class="card">
+      <div class="ctitle">&#9733; List all your authenticated accounts at any time</div>
+      <p>Type this in Claude Desktop chat to see every alias and the Gmail it's bound to:</p>
+      <div class="cb"><div class="cbh"><span class="cbl b">claude prompt</span><button class="cpb" onclick="cp(this,'list all my gsc accounts with alias using gsc-multi')">Copy</button></div><pre>list all my gsc accounts with alias using gsc-multi</pre></div>
+      <p>Claude will call the <code>list_accounts</code> tool and print a two-column list: <strong>alias</strong> on the left, <strong>email</strong> on the right.</p>
+    </div>
+    <div class="card">
+      <div class="ctitle">&#9733; Always pass the alias, never the email</div>
+      <div class="wb" style="margin-top:8px;"><strong>When running any gsc-multi tool, use the alias exactly as shown in the left column as the <code>account</code> parameter. For example, to query <code>searchconsoleanalyticsaccess4@gmail.com</code>, pass <code>account: "searchconsoleanalyticsaccess4"</code>.</strong></div>
+      <p style="margin-top:10px;">If you pass the full email, the server replies "alias not found" and lists the available aliases. The alias is the part before <code>@gmail.com</code> (the convention this guide uses), but it can be any nickname you chose when you ran <code>gsc-mcp-auth --alias &lt;name&gt;</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========================== PANEL: BOTH ========================== -->
+<div class="panel" id="panel-both">
+  <div class="cfg-ban">
+    <h3>&#9881; Combined Config &mdash; Both MCPs Together</h3>
+    <p class="csub">Complete setup for gsc-deep (<strong>MCP Deep tab</strong>) AND gsc-multi (<strong>MCP Multi tab</strong>) first, then paste this combined config. Both servers will be live after a full Claude Desktop restart.</p>
+    <div class="cfg-tags">
+      <span class="ctg d"><span class="cd"></span> gsc-deep</span>
+      <span class="ctg m"><span class="cd"></span> gsc-multi</span>
+    </div>
+    <div class="cb">
+      <div class="cbh"><span class="cbl p">claude_desktop_config.json &mdash; final combined config</span><button class="cpb" id="bcpy" onclick="cBoth()">Copy</button></div>
+      <pre>{
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"gsc-deep"</span>: {
+      <span class="c">// Deep analytics MCP — requires uvx + client_secrets.json</span>
+      <span class="k">"command"</span>: <span class="s">"C:\\Users\\YOUR_USERNAME\\.local\\bin\\uvx.exe"</span>,
+      <span class="k">"args"</span>: [<span class="s">"mcp-search-console"</span>],
+      <span class="k">"env"</span>: {
+        <span class="k">"GSC_OAUTH_CLIENT_SECRETS_FILE"</span>: <span class="s">"C:\\Users\\YOUR_USERNAME\\Documents\\client_secrets.json"</span>
+      }
+    },
+    <span class="k">"gsc-multi"</span>: {
+      <span class="c">// Multi-account MCP — built-in OAuth, no credentials file needed</span>
+      <span class="k">"command"</span>: <span class="s">"node"</span>,
+      <span class="k">"args"</span>: [
+        <span class="s">"C:\\Users\\YOUR_USERNAME\\AppData\\Roaming\\npm\\node_modules\\google-searchconsole-mcp\\dist\\index.js"</span>
+      ]
+    }
+  }
+}</pre>
+    </div>
+    <div class="wb" style="margin-top:12px;margin-bottom:0;"><strong>Windows path rule:</strong> Every backslash must be doubled: <code>\</code> becomes <code>\\</code>. Spaces in folder names are fine. Always use straight double quotes <code>"</code>.</div>
+  </div>
+
+  <div class="section">
+    <div class="shd"><div class="sn p">How it works</div><div><div class="stitle">Using Both MCPs in a Single Chat</div><div class="ssub">Each MCP has a different name. Tell Claude which one to use by naming it in your prompt.</div></div></div>
+    <div class="card">
+      <div class="ctitle">When to use which MCP</div>
+      <div class="bf">
+        <div class="bfc"><h4><span class="fbdg d">gsc-deep</span> Deep per-site analysis</h4><p>URL-level inspection, sitemap audits, mobile usability, indexing status, comparing time periods. Requires your Google credentials file.</p></div>
+        <div class="bfc"><h4><span class="fbdg m">gsc-multi</span> Multi-account management</h4><p>Managing multiple Google accounts, comparing across all properties, checking all sites at once. No Google Cloud setup required.</p></div>
+      </div>
+      <div class="ib" style="margin-top:4px;">Start your prompt with <strong>"Using gsc-deep..."</strong> or <strong>"Using gsc-multi..."</strong> to direct Claude to the right MCP. If you do not specify, Claude will choose one automatically based on the task.</div>
+    </div>
+    <div class="card">
+      <div class="ctitle">Setup checklist before using the Both config</div>
+      <ol>
+        <li>Complete all steps in the <strong>MCP Deep</strong> tab (Google Cloud credentials, uv install, OAuth login triggered)</li>
+        <li>Complete all steps in the <strong>MCP Multi</strong> tab (npm install, accounts authenticated with aliases)</li>
+        <li>Copy the combined config above and paste it into <code>claude_desktop_config.json</code> in Notepad</li>
+        <li>Quit Claude from the system tray (bottom-right near the clock) &rarr; reopen Claude Desktop</li>
+        <li>Test with the prompts below</li>
+      </ol>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="ps">
+    <div class="psh">
+      <h2>&#9679; Test Prompts &mdash; Both MCPs Together</h2>
+      <p>These prompts chain gsc-deep and gsc-multi in a single workflow. Replace <code>domain.com</code> with your actual site. For gsc-deep &mdash; domain only. For gsc-multi &mdash; always include account + domain.</p>
+    </div>
+    <div class="psg">
+      <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, list all Search Console properties with access levels. Then using gsc-deep, check the top 3 pages by clicks for domain.com and show their indexing status.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS list all properties. Then using gsc-deep check the top 3 pages by clicks for domain.com and show their indexing status."</span><div class="pm"><span class="pmcp bth">both</span><span class="pcp">Copy &#8599;</span></div></div>
+      <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, show top 5 keywords by impressions for domain.com. Then using gsc-deep, check if the pages ranking for those keywords on domain.com have any mobile usability issues.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS show top 5 keywords for domain.com. Then using gsc-deep check if those ranking pages have mobile usability issues."</span><div class="pm"><span class="pmcp bth">both</span><span class="pcp">Copy &#8599;</span></div></div>
+      <div class="pc" onclick="cpP(this,'Using gsc-deep, audit sitemaps for domain.com and show any errors. Then using gsc-multi and account YOUR_ALIAS, show which pages from those sitemaps have the lowest CTR for domain.com.')"><span class="pt">"Using gsc-deep audit sitemaps for domain.com and show errors. Then using gsc-multi and account YOUR_ALIAS show which pages from those sitemaps have the lowest CTR."</span><div class="pm"><span class="pmcp bth">both</span><span class="pcp">Copy &#8599;</span></div></div>
+      <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, compare the last 28 days vs previous 28 days traffic for domain.com. Then using gsc-deep, inspect the URLs on domain.com that lost the most impressions and explain why.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS compare last 28 vs previous 28 days for domain.com. Then using gsc-deep inspect the URLs that lost the most impressions and explain why."</span><div class="pm"><span class="pmcp bth">both</span><span class="pcp">Copy &#8599;</span></div></div>
+      <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, find all pages on domain.com with CTR below 2%. Then using gsc-deep, check the indexing status of each of those pages.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS find all pages on domain.com with CTR below 2%. Then using gsc-deep check the indexing status of each of those pages."</span><div class="pm"><span class="pmcp bth">both</span><span class="pcp">Copy &#8599;</span></div></div>
+      <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, show keywords for domain.com in positions 11 to 20 with high impressions. Then using gsc-deep, check if those pages on domain.com have any technical issues blocking better rankings.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS show keywords for domain.com in positions 11–20 with high impressions. Then using gsc-deep check if those pages have technical issues blocking better rankings."</span><div class="pm"><span class="pmcp bth">both</span><span class="pcp">Copy &#8599;</span></div></div>
+      <div class="pc" onclick="cpP(this,'Using gsc-deep, show top queries, pages, countries, and devices for domain.com for the last 30 days.')"><span class="pt">"Using gsc-deep, show top queries, pages, countries, and devices for domain.com for the last 30 days."</span><div class="pm"><span class="pmcp d">gsc-deep</span><span class="pcp">Copy &#8599;</span></div></div>
+      <div class="pc" onclick="cpP(this,'Using gsc-multi and account YOUR_ALIAS, compare the last 28 days vs previous 28 days traffic for domain.com.')"><span class="pt">"Using gsc-multi and account YOUR_ALIAS, compare the last 28 days vs previous 28 days traffic for domain.com."</span><div class="pm"><span class="pmcp m">gsc-multi</span><span class="pcp">Copy &#8599;</span></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="shd"><div class="sn p">Remember</div><div><div class="stitle">Combined cheat sheet</div><div class="ssub">Two rules that always apply when using both MCPs together in a single chat.</div></div></div>
+    <div class="card">
+      <div class="ctitle">&#9733; Always name the MCP at the start of every prompt step</div>
+      <p>Claude does not reliably auto-pick between the two servers. Be explicit, especially when chaining steps:</p>
+      <div class="bf">
+        <div class="bfc"><h4><span class="fbdg d">gsc-deep</span></h4><p style="font-style:italic;">"Using gsc-deep, ..."</p><p style="font-size:12px;color:var(--muted);margin-top:6px;">Single account &mdash; just mention the domain. No <code>account</code> needed.</p></div>
+        <div class="bfc"><h4><span class="fbdg m">gsc-multi</span></h4><p style="font-style:italic;">"Using gsc-multi and account YOUR_ALIAS, ..."</p><p style="font-size:12px;color:var(--muted);margin-top:6px;">Multiple accounts &mdash; the alias is required on every call.</p></div>
+      </div>
+      <p style="margin-top:8px;font-size:13px;">In a chained prompt, repeat the "Using ..." prefix for each step so Claude routes each call to the right server.</p>
+    </div>
+    <div class="card">
+      <div class="ctitle">&#9733; gsc-multi takes the alias, never the email</div>
+      <div class="wb" style="margin-top:8px;"><strong>When running any gsc-multi tool, use the alias exactly as shown in the left column as the <code>account</code> parameter. For example, to query <code>searchconsoleanalyticsaccess4@gmail.com</code>, pass <code>account: "searchconsoleanalyticsaccess4"</code>.</strong></div>
+      <p style="margin-top:10px;">Forgot which aliases exist? Ask Claude to list them:</p>
+      <div class="cb"><div class="cbh"><span class="cbl b">claude prompt</span><button class="cpb" onclick="cp(this,'list all my gsc accounts with alias using gsc-multi')">Copy</button></div><pre>list all my gsc accounts with alias using gsc-multi</pre></div>
+      <p style="font-size:13px;">The response is a two-column list &mdash; <strong>alias</strong> on the left, <strong>email</strong> on the right. Use the left column value wherever a prompt expects <code>YOUR_ALIAS</code>.</p>
+    </div>
+  </div>
+  <div class="div"></div>
+
+  <div class="fin">
+    <h2>Both MCPs Active &#10003;</h2>
+    <p>gsc-deep handles deep per-site analytics, URL inspection and sitemap audits. gsc-multi handles multi-account management. Together they give you complete SEO visibility in a single Claude Desktop chat.</p>
+  </div>
+</div>
+
+</div>
+
+<script>
+function sw(t){
+  ['deep','multi','both'].forEach(x=>{
+    document.getElementById('panel-'+x).classList.remove('show');
+    const b=document.getElementById('tb-'+x);
+    b.className='tb';
+  });
+  document.getElementById('panel-'+t).classList.add('show');
+  const map={deep:'ad',multi:'am',both:'ab'};
+  document.getElementById('tb-'+t).classList.add(map[t]);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function cp(btn,text){
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('ok');btn.textContent='Copied!';
+    setTimeout(()=>{btn.classList.remove('ok');btn.textContent='Copy';},2000);
+  });
+}
+function cDeep(){
+  const t='{\n  "mcpServers": {\n    "gsc-deep": {\n      "command": "C:\\\\Users\\\\YOUR_USERNAME\\\\.local\\\\bin\\\\uvx.exe",\n      "args": ["mcp-search-console"],\n      "env": {\n        "GSC_OAUTH_CLIENT_SECRETS_FILE": "C:\\\\Users\\\\YOUR_USERNAME\\\\Documents\\\\client_secrets.json"\n      }\n    }\n  }\n}';
+  navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('dcpy');b.classList.add('ok');b.textContent='Copied!';setTimeout(()=>{b.classList.remove('ok');b.textContent='Copy';},2500);});
+}
+function cMulti(){
+  const t='{\n  "mcpServers": {\n    "gsc-multi": {\n      "command": "node",\n      "args": [\n        "C:\\\\Users\\\\YOUR_USERNAME\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\google-searchconsole-mcp\\\\dist\\\\index.js"\n      ]\n    }\n  }\n}';
+  navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('mcpy');b.classList.add('ok');b.textContent='Copied!';setTimeout(()=>{b.classList.remove('ok');b.textContent='Copy';},2500);});
+}
+function cBoth(){
+  const t='{\n  "mcpServers": {\n    "gsc-deep": {\n      "command": "C:\\\\Users\\\\YOUR_USERNAME\\\\.local\\\\bin\\\\uvx.exe",\n      "args": ["mcp-search-console"],\n      "env": {\n        "GSC_OAUTH_CLIENT_SECRETS_FILE": "C:\\\\Users\\\\YOUR_USERNAME\\\\Documents\\\\client_secrets.json"\n      }\n    },\n    "gsc-multi": {\n      "command": "node",\n      "args": [\n        "C:\\\\Users\\\\YOUR_USERNAME\\\\AppData\\\\Roaming\\\\npm\\\\node_modules\\\\google-searchconsole-mcp\\\\dist\\\\index.js"\n      ]\n    }\n  }\n}';
+  navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('bcpy');b.classList.add('ok');b.textContent='Copied!';setTimeout(()=>{b.classList.remove('ok');b.textContent='Copy';},2500);});
+}
+function cpP(el,text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=el.querySelector('.pcp');
+    btn.textContent='Copied!';
+    el.style.borderColor='var(--copper)';
+    setTimeout(()=>{btn.innerHTML='Copy &#8599;';el.style.borderColor='';},1800);
+  });
+}
+
+/* ===== gsc-multi Step 03 wizard ===== */
+const MULTI_CLIENT_ID="626206608100-ftn862187759dgdkiojaaslrfgecq9ss.apps.googleusercontent.com";
+function buildMultiAuthUrl(email){
+  const p=new URLSearchParams({access_type:"offline",scope:"https://www.googleapis.com/auth/webmasters.readonly https://www.googleapis.com/auth/userinfo.email",prompt:"consent",response_type:"code",client_id:MULTI_CLIENT_ID,redirect_uri:"http://localhost:3000/oauth2callback",login_hint:email});
+  return "https://accounts.google.com/o/oauth2/v2/auth?"+p.toString();
+}
+function deriveMultiAlias(email){
+  const local=(email.split("@")[0]||"").toLowerCase().trim();
+  return local.replace(/[^a-z0-9_-]/g,"-");
+}
+function genMultiAccounts(){
+  const n=Math.max(1,Math.min(50,parseInt(document.getElementById("numMultiAccounts").value)||1));
+  const container=document.getElementById("multiAccountsList");
+  container.innerHTML="";
+  for(let i=0;i<n;i++){
+    const card=document.createElement("div");
+    card.className="macc";
+    card.innerHTML=`
+      <div class="macc-hd">
+        <h4>Account ${i+1} of ${n}</h4>
+        <label class="macc-done"><input type="checkbox" class="done-cb"> Mark as done</label>
+      </div>
+      <label class="macc-lbl">Gmail address</label>
+      <input type="email" class="macc-in email-in" placeholder="e.g. youraccount@gmail.com" autocomplete="off">
+      <label class="macc-lbl">Alias <small>(auto-derived from local-part &mdash; edit to customize)</small></label>
+      <input type="text" class="macc-in alias-in" placeholder="(fill in email first)" autocomplete="off">
+      <div class="macc-cmd" style="display:none;">
+        <p class="macc-cmd-lbl">Run in Command Prompt:</p>
+        <div class="cb"><div class="cbh"><span class="cbl b">cmd</span><button class="cpb">Copy</button></div><pre class="cmd-text"></pre></div>
+        <p class="macc-cmd-lbl">Or paste this URL in an incognito window:</p>
+        <div class="macc-url"><span class="url-text"></span><button class="cpb">Copy</button></div>
+        <p class="macc-note">Sign in on the consent page using <strong class="email-ref"></strong>. The local helper on <code>localhost:3000</code> catches the callback automatically.</p>
+      </div>
+    `;
+    const emailIn=card.querySelector(".email-in");
+    const aliasIn=card.querySelector(".alias-in");
+    const doneCb=card.querySelector(".done-cb");
+    emailIn.addEventListener("input",()=>{
+      if(!aliasIn.dataset.userEdited) aliasIn.value=deriveMultiAlias(emailIn.value);
+      rebuildMultiCmd(card);
+    });
+    aliasIn.addEventListener("input",()=>{
+      aliasIn.dataset.userEdited="1";
+      rebuildMultiCmd(card);
+    });
+    doneCb.addEventListener("change",()=>{
+      card.classList.toggle("done",doneCb.checked);
+      updateMultiSummary();
+    });
+    card.querySelectorAll(".cpb").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const wrap=btn.closest(".cb, .macc-url");
+        if(!wrap) return;
+        const clone=wrap.cloneNode(true);
+        clone.querySelectorAll("button").forEach(b=>b.remove());
+        cp(btn,clone.textContent.trim());
+      });
+    });
+    container.appendChild(card);
+  }
+  document.getElementById("multiSummary").style.display="block";
+  updateMultiSummary();
+}
+function rebuildMultiCmd(card){
+  const email=card.querySelector(".email-in").value.trim();
+  const alias=card.querySelector(".alias-in").value.trim();
+  const block=card.querySelector(".macc-cmd");
+  if(!email||!alias){block.style.display="none";return;}
+  block.style.display="block";
+  card.querySelector(".cmd-text").textContent=`gsc-mcp-auth --alias ${alias}`;
+  card.querySelector(".url-text").textContent=buildMultiAuthUrl(email);
+  card.querySelector(".email-ref").textContent=email;
+}
+function updateMultiSummary(){
+  const total=document.querySelectorAll(".macc").length;
+  const done=document.querySelectorAll(".macc.done").length;
+  const el=document.getElementById("multiSummaryText");
+  if(el) el.textContent=`${done} of ${total} accounts marked done.`;
+}
+</script>
+</body>
+</html>
