@@ -298,7 +298,8 @@ npm --version</pre></div>
         <li>Scroll to <strong>Test users</strong> section &rarr; click <strong>+ Add Users</strong></li>
         <li>Enter <code>your-google-email@gmail.com</code> and click <strong>Save</strong></li>
       </ol>
-      <div class="ob">You do not need Google to verify your app. Adding yourself as a test user is the complete fix for all 403 errors.</div>
+      <div class="ib" style="margin-top:10px;"><strong>&#9733; Pro tip &mdash; add ALL the Gmails you might ever use here, in one go.</strong> The <em>+ Add Users</em> dialog accepts multiple emails at once: paste them comma-separated, or one per line. Google lets you have up to <strong>100 test users</strong> on an unverified consent screen.<br><br>Why do this up front: gsc-deep is single-account, but you may want to point it at a different Gmail later (a client's GSC, a backup account, etc.). Every Gmail you skip here will need a return trip to this Google Cloud Console step plus a project re-verify before it can sign in. Adding all of them now means future account switches are just a <code>Call reauthenticate</code> away &mdash; no return to Google Cloud Console needed.</div>
+      <div class="ob">You do not need Google to verify your app. Adding yourself (and any other Gmails you plan to use later) as test users is the complete fix for all 403 errors.</div>
     </div>
   </div>
   <div class="div"></div>
@@ -351,20 +352,52 @@ npm --version</pre></div>
   <div class="div"></div>
 
   <div class="section" id="d5">
-    <div class="shd"><div class="sn t">Step 05</div><div><div class="stitle">Trigger OAuth &mdash; Connect Your Google Account</div><div class="ssub">Done inside Claude Desktop chat. Browser opens automatically.</div></div></div>
+    <div class="shd"><div class="sn t">Step 05</div><div><div class="stitle">Trigger OAuth &mdash; Connect Your Google Account</div><div class="ssub">Pick any of the options below. All three do the same thing: open Google sign-in, save a token locally for future runs.</div></div></div>
+
     <div class="card">
-      <div class="ctitle">Trigger authentication from Claude Desktop chat</div>
+      <div class="ctitle">What is <code>reauthenticate</code>, and why do you need to call it?</div>
+      <p><code>reauthenticate</code> is a tool built into the gsc-deep MCP server. When you call it, it does three things, in order:</p>
+      <ol style="margin-top:6px;">
+        <li>Opens a browser window to Google's OAuth consent page, using the OAuth client ID from your <code>client_secrets.json</code></li>
+        <li>After you click Allow, exchanges the authorization code Google sends back for an access token and a refresh token</li>
+        <li>Saves both tokens to your local user-config directory so future tool calls don't need a re-login (the refresh token auto-renews the access token in the background)</li>
+      </ol>
+      <p style="margin-top:12px;"><strong>When you must run it:</strong></p>
+      <ul style="margin-top:4px;">
+        <li><strong>First-time setup &mdash; mandatory.</strong> No tokens exist yet, so any other gsc-deep tool you call will fail with "tool timed out" or "no credentials".</li>
+        <li><strong>Switching the gsc-deep server to a different Google account.</strong> Saved tokens are single-account. Re-running <code>reauthenticate</code> and signing in with a different Gmail replaces the previous token.</li>
+        <li><strong>If you suddenly get 401 / timeout errors after months of working fine.</strong> The refresh token can be revoked by Google (e.g. password changes, security review, or 6+ months of inactivity). Re-running fixes it.</li>
+      </ul>
+      <div class="ob" style="margin-top:10px;">After the first successful login you do <strong>not</strong> need to re-run <code>reauthenticate</code> on every Claude restart. Tokens persist on disk across sessions, and the refresh token keeps them valid indefinitely until revoked.</div>
+    </div>
+
+    <div class="card">
+      <div class="ctitle">Option A &mdash; In Claude Desktop chat <span style="font-size:11px;color:var(--muted);font-weight:normal;">(recommended &mdash; one click, no terminal)</span></div>
       <span class="ac claud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="12" r="3"/></svg>Claude Desktop &mdash; type in chat</span>
       <div class="cb" style="margin-top:10px;"><div class="cbh"><span class="cbl t">claude prompt</span><button class="cpb" onclick="cp(this,'Call reauthenticate')">Copy</button></div><pre>Call reauthenticate</pre></div>
       <span class="ac brws" style="margin-top:6px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Browser opens automatically</span>
-      <ol style="margin-top:8px;"><li>Select the Google account you added as a test user in Step 02 (e.g. <code>your-google-email@gmail.com</code>)</li><li>Click <strong>Allow</strong> on the permissions screen</li><li>Wait for "Authentication successful" in the browser before closing it</li><li>gsc-deep is now connected. You do not need to include the account email in any prompts &mdash; just mention the domain.</li></ol>
+      <ol style="margin-top:8px;"><li>Select the Google account you added as a test user in Step 02 (e.g. <code>your-google-email@gmail.com</code>). If you added multiple test users there, you'll see a chooser &mdash; pick the one you want to bind gsc-deep to.</li><li>Click <strong>Allow</strong> on the permissions screen</li><li>Wait for "Authentication successful" to appear in the browser before closing it</li><li>gsc-deep is now connected. You do not need to include the account email in any future prompts &mdash; just mention the domain.</li></ol>
     </div>
+
     <div class="card">
-      <div class="ctitle">Alternative: trigger from Command Prompt if browser did not open</div>
+      <div class="ctitle">Option B &mdash; From Command Prompt <span style="font-size:11px;color:var(--muted);font-weight:normal;">(fallback if Option A's browser didn't open)</span></div>
       <span class="ac cmd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Command Prompt (cmd.exe)</span>
       <div class="ho"><strong>How to open:</strong> Press <span class="kbd">Win</span> + <span class="kbd">R</span> &rarr; type <span class="kbd">cmd</span> &rarr; press <span class="kbd">Enter</span></div>
       <div class="cb"><div class="cbh"><span class="cbl">cmd</span><button class="cpb" onclick="cp(this,'\"C:\\Users\\YOUR_USERNAME\\.local\\bin\\uvx.exe\" mcp-search-console')">Copy</button></div><pre>"C:\Users\YOUR_USERNAME\.local\bin\uvx.exe" mcp-search-console</pre></div>
-      <p>Complete the Google sign-in in the browser that opens. Then close Command Prompt and restart Claude Desktop from the system tray.</p>
+      <p>Running this starts the MCP server directly. On first launch with no saved token, it spins up a local HTTP listener on a random port and opens your default browser to Google's consent page. Complete the sign-in, wait for "Authentication successful", then come back to Command Prompt and press <span class="kbd">Ctrl</span> + <span class="kbd">C</span> to stop the server. Then restart Claude Desktop from the system tray so the saved token is loaded by the in-app server.</p>
+    </div>
+
+    <div class="card" style="border-style:dashed;background:var(--surface2);">
+      <div class="ctitle">Option C &mdash; "Paste a URL in incognito" &mdash; <span style="font-size:11px;color:var(--muted);font-weight:normal;">not available for gsc-deep</span></div>
+      <p style="font-size:13px;">gsc-multi offers this option because it uses a <strong>bundled</strong> OAuth client and a <strong>fixed</strong> callback URL (<code>http://localhost:3000/oauth2callback</code>) &mdash; both known ahead of time, so a working URL can be generated for you to paste anywhere.</p>
+      <p style="font-size:13px;margin-top:8px;">gsc-deep uses <strong>your own</strong> OAuth client from <code>client_secrets.json</code>, and the underlying Python library binds the callback to a <strong>randomly-chosen localhost port</strong> per run. Neither value is known until the server is actually running, so a paste-URL can't be pre-generated reliably.</p>
+      <div class="ib" style="margin-top:8px;"><strong>How to control which Google account gets picked anyway:</strong>
+        <ul style="margin-top:6px;margin-bottom:0;padding-left:22px;">
+          <li><strong>Easiest &mdash;</strong> sign out of all other Google accounts in your default browser before clicking Option A. Or open Claude Desktop in an environment where Chrome/Edge has only the target Gmail signed in.</li>
+          <li><strong>Most reliable &mdash;</strong> in Step 02, add <em>only</em> the Gmail you want gsc-deep bound to as a test user. Google's account chooser will hide accounts that aren't whitelisted.</li>
+          <li><strong>If you authenticated the wrong account &mdash;</strong> just call <code>reauthenticate</code> again with the right browser state. The new token overwrites the old one.</li>
+        </ul>
+      </div>
     </div>
   </div>
   <div class="div"></div>
